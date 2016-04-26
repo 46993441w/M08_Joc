@@ -1,37 +1,21 @@
 /// <reference path="phaser/phaser.d.ts"/>
 
 import Point = Phaser.Point;
-class mainState extends Phaser.State {
-    game: Phaser.Game;
 
-    preload():void {
-        super.preload();
+module joc{
+    export class SimpleGame extends Phaser.Game{
+        constructor() {
+            super(600, 600, Phaser.AUTO, 'gameDiv');
 
-        this.physics.startSystem(Phaser.Physics.ARCADE);
-    }
+            this.state.add("load", loadState);
+            this.state.add("menu", menuState);
+            this.state.add("game", gameMain);
 
-    create():void {
-        super.create();
-
-    }
-
-    update():void {
-        super.update();
-
-    }
-}
-
-class SimpleGame {
-    game:Phaser.Game;
-
-    constructor() {
-        this.game = new Phaser.Game(600, 600, Phaser.AUTO, 'gameDiv');
-
-        this.game.state.add('main', mainState);
-        this.game.state.start('main');
+            this.state.start("load");
+        }
     }
 }
 
 window.onload = () => {
-    var game = new SimpleGame();
+    var game = new joc.SimpleGame();
 };

@@ -6,6 +6,9 @@
     "experimentalDecorators": true
   },
   "files": [
-    "main.ts"
+    "main.ts",
+    "loadState.ts",
+    "menuState.ts",
+    "gameMain.ts"
   ]
 }
