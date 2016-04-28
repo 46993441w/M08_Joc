@@ -10,6 +10,7 @@ module joc {
         private jugadorVides:Phaser.Group;
         private gameLevel:Phaser.Text;
         private gamePuntuacio:Phaser.Text;
+        private introText:Phaser.Text;
 
         private MAX_SPEED = 400; // pixels/second
         private velocitat_birra = 100;
@@ -22,6 +23,9 @@ module joc {
 
         create():void {
             super.create();
+
+            // fer que no colisioni per la paret de sota del mon
+            this.game.physics.arcade.checkCollision.down = false;
 
             this.crearFons();
             this.crearJugador();
@@ -54,6 +58,9 @@ module joc {
 
             this.gameLevel = this.add.text(this.world.width - 120,this.world.height - 43, "Nivell: " + this.nivell,{font: '16px Arial', fill: '#ffffff'})
             this.gamePuntuacio = this.add.text(this.world.width - 120,this.world.height - 23, "Puntuació: " + this.contador,{font: '16px Arial', fill: '#ffffff'})
+            this.introText = this.add.text(this.world.centerX,this.world.centerY, "Contador final: " + this.contador,{font: '40px Arial', fill: '#ffffff'})
+            this.introText.anchor.setTo(0.5, 0.5);
+            this.introText.visible = false;
         }
 
         private crearJugador():void {
@@ -89,6 +96,7 @@ module joc {
 
             this.birra.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED); // x, y
             this.birra.body.collideWorldBounds = true;
+            this.birra.events.onOutOfBounds.add(this.perdreVida, this);
         }
 
         private moureJugador():void {
@@ -113,6 +121,7 @@ module joc {
         private agafarBirra():void {
             this.contador += 1;
             this.gamePuntuacio.setText("Puntuació: " + this.contador);
+            this.add.tween(this.jugador.scale).to({x: [1, 2, 1], y: [1, 2, 1]}, 1000, Phaser.Easing.Bounce.Out, true);
             this.birra.body.y = 0;
             this.birra.body.x = this.rnd.integerInRange(0,this.world.width);
             if(this.contador%10 == 0){
@@ -120,6 +129,27 @@ module joc {
                 this.velocitat_birra += 50;
                 this.gameLevel.setText("Nivell: " + this.nivell);
             }
+        }
+
+        private perdreVida():void {
+            this.jugador.damage(1);
+            if (this.jugador.health == 0) {
+                this.gameOver();
+            } else {
+                this.birra.x = this.rnd.integerInRange(0,this.world.width);
+                this.birra.y = 0;
+                this.jugadorVides.getFirstAlive().kill();//this.jugador.health).;
+            }
+        }
+
+        private gameOver():void {
+            this.introText.setText("Contador final: " + this.contador);
+            this.introText.visible = true;
+            this.time.events.add(Phaser.Timer.SECOND * 3, this.restart, this);
+        }
+
+        private restart():void {
+            this.game.state.start(this.game.state.current);
         }
     }
 }

@@ -20,6 +20,8 @@ var joc;
         }
         gameMain.prototype.create = function () {
             _super.prototype.create.call(this);
+            // fer que no colisioni per la paret de sota del mon
+            this.game.physics.arcade.checkCollision.down = false;
             this.crearFons();
             this.crearJugador();
             this.crearVides();
@@ -43,6 +45,9 @@ var joc;
             this.add.sprite(0, this.world.height - 43, bmd);
             this.gameLevel = this.add.text(this.world.width - 120, this.world.height - 43, "Nivell: " + this.nivell, { font: '16px Arial', fill: '#ffffff' });
             this.gamePuntuacio = this.add.text(this.world.width - 120, this.world.height - 23, "Puntuació: " + this.contador, { font: '16px Arial', fill: '#ffffff' });
+            this.introText = this.add.text(this.world.centerX, this.world.centerY, "Contador final: " + this.contador, { font: '40px Arial', fill: '#ffffff' });
+            this.introText.anchor.setTo(0.5, 0.5);
+            this.introText.visible = false;
         };
         gameMain.prototype.crearJugador = function () {
             this.jugador = this.add.sprite(this.world.centerX, 50, 'jugador');
@@ -71,6 +76,7 @@ var joc;
             this.physics.enable(this.birra, Phaser.Physics.ARCADE); // activar la fisica del jugador
             this.birra.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED); // x, y
             this.birra.body.collideWorldBounds = true;
+            this.birra.events.onOutOfBounds.add(this.perdreVida, this);
         };
         gameMain.prototype.moureJugador = function () {
             if (this.cursor.left.isDown ||
@@ -94,6 +100,7 @@ var joc;
         gameMain.prototype.agafarBirra = function () {
             this.contador += 1;
             this.gamePuntuacio.setText("Puntuació: " + this.contador);
+            this.add.tween(this.jugador.scale).to({ x: [1, 2, 1], y: [1, 2, 1] }, 1000, Phaser.Easing.Bounce.Out, true);
             this.birra.body.y = 0;
             this.birra.body.x = this.rnd.integerInRange(0, this.world.width);
             if (this.contador % 10 == 0) {
@@ -101,6 +108,25 @@ var joc;
                 this.velocitat_birra += 50;
                 this.gameLevel.setText("Nivell: " + this.nivell);
             }
+        };
+        gameMain.prototype.perdreVida = function () {
+            this.jugador.damage(1);
+            if (this.jugador.health == 0) {
+                this.gameOver();
+            }
+            else {
+                this.birra.x = this.rnd.integerInRange(0, this.world.width);
+                this.birra.y = 0;
+                this.jugadorVides.getFirstAlive().kill(); //this.jugador.health).;
+            }
+        };
+        gameMain.prototype.gameOver = function () {
+            this.introText.setText("Contador final: " + this.contador);
+            this.introText.visible = true;
+            this.time.events.add(Phaser.Timer.SECOND * 3, this.restart, this);
+        };
+        gameMain.prototype.restart = function () {
+            this.game.state.start(this.game.state.current);
         };
         return gameMain;
     })(Phaser.State);
