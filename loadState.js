@@ -27,6 +27,8 @@ var joc;
             this.load.image('jugador_esquerra', 'assets/nen_esquerra.png');
             this.load.image('birra', 'assets/cerveza1.png');
             this.load.image('fons', 'assets/cielo.jpg');
+            // Precarguem els audios
+            this.load.audio('sfx', 'assets/fx_mixdown.ogg');
             //Activem la fisica al joc
             this.physics.startSystem(Phaser.Physics.ARCADE);
         };

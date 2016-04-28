@@ -43,6 +43,10 @@ var joc;
             bmd.ctx.fillStyle = '#003300';
             bmd.ctx.fill();
             this.add.sprite(0, this.world.height - 43, bmd);
+            this.audio = this.add.audio('sfx');
+            this.audio.allowMultiple = true;
+            this.audio.addMarker('ping', 10, 1.0);
+            this.audio.addMarker('death', 12, 4.2);
             this.gameLevel = this.add.text(this.world.width - 120, this.world.height - 43, "Nivell: " + this.nivell, { font: '16px Arial', fill: '#ffffff' });
             this.gamePuntuacio = this.add.text(this.world.width - 120, this.world.height - 23, "Puntuació: " + this.contador, { font: '16px Arial', fill: '#ffffff' });
             this.introText = this.add.text(this.world.centerX, this.world.centerY, "Contador final: " + this.contador, { font: '40px Arial', fill: '#ffffff' });
@@ -100,6 +104,7 @@ var joc;
         gameMain.prototype.agafarBirra = function () {
             this.contador += 1;
             this.gamePuntuacio.setText("Puntuació: " + this.contador);
+            this.audio.play('ping');
             this.add.tween(this.jugador.scale).to({ x: [1, 2, 1], y: [1, 2, 1] }, 1000, Phaser.Easing.Bounce.Out, true);
             this.birra.body.y = 0;
             this.birra.body.x = this.rnd.integerInRange(0, this.world.width);
@@ -111,6 +116,7 @@ var joc;
         };
         gameMain.prototype.perdreVida = function () {
             this.jugador.damage(1);
+            this.audio.play('death');
             if (this.jugador.health == 0) {
                 this.gameOver();
             }
